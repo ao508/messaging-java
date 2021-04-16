@@ -44,7 +44,7 @@ public class JSGatewayImpl implements Gateway {
     private final Map<String, JetStreamSubscription> subscribers = new HashMap<>();
     private BlockingQueue<PublishingQueueTask> publishingQueue = new LinkedBlockingQueue<>();
     private ExecutorService exec = Executors.newSingleThreadExecutor();
-    private volatile Boolean shutdownInitiated = Boolean.FALSE;
+    private Boolean shutdownInitiated;
 
     // connection variables
     @Value("${nats.url}")
@@ -197,7 +197,6 @@ public class JSGatewayImpl implements Gateway {
         public NATSPublisher(Options options) throws IOException, InterruptedException {
             this.natsConn = Nats.connect(options);
             this.jsConn = natsConn.jetStream(JetStreamOptions.DEFAULT_JS_OPTIONS);
-            this.interrupted = Boolean.FALSE;
         }
 
         @Override
