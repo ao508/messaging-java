@@ -136,7 +136,7 @@ public class JSGatewayImpl implements Gateway {
             ConsumerConfiguration consumerConfig = ConsumerConfiguration.builder()
                     .durable(consumerName)
                     .filterSubject(filterSubject)
-                    .deliverSubject(subject)
+                    .deliverSubject(filterSubject)
                     .deliverPolicy(DeliverPolicy.New)
                     .ackPolicy(AckPolicy.All)
                     .replayPolicy(ReplayPolicy.Instant)
