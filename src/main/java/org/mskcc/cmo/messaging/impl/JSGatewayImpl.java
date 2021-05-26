@@ -130,6 +130,8 @@ public class JSGatewayImpl implements Gateway {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
         if (!subscribers.containsKey(subject)) {
+            LOG.info("Setting up subcriber for subject: " + subject);
+            LOG.info("Using filter subject: " + filterSubject);
             Dispatcher dispatcher = natsConnection.createDispatcher();
             ConsumerConfiguration consumerConfig = ConsumerConfiguration.builder()
                     .durable(consumerName)
