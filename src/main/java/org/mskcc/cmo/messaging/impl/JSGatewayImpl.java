@@ -133,19 +133,8 @@ public class JSGatewayImpl implements Gateway {
             LOG.info("Setting up subcriber for subject: " + subject);
             LOG.info("Using filter subject: " + filterSubject);
             Dispatcher dispatcher = natsConnection.createDispatcher();
-            ConsumerConfiguration consumerConfig = ConsumerConfiguration.builder()
-                    .durable(consumerName)
-                    .filterSubject(filterSubject)
-                    .deliverSubject(filterSubject)
-                    .deliverPolicy(DeliverPolicy.New)
-                    .ackPolicy(AckPolicy.All)
-                    .replayPolicy(ReplayPolicy.Instant)
-                    .build();
-            PushSubscribeOptions options = PushSubscribeOptions.builder()
-                    .configuration(consumerConfig)
-                    .build();
             JetStreamSubscription sub = jsConnection.subscribe(subject, dispatcher,
-                msg -> onMessage(msg, messageClass, messageConsumer), true, options);
+                msg -> onMessage(msg, messageClass, messageConsumer), false);
             subscribers.put(subject, sub);
         }
     }
