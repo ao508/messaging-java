@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -226,10 +227,14 @@ public class JSGatewayImpl implements Gateway {
                     if (task != null && task.payload != null) {
                         String msg = mapper.writeValueAsString(task.payload);
                         try {
-                            PublishAck ack = jsConn.publish(task.subject, msg.getBytes());
-                            if (ack.getError() != null) {
-                                writeToPublishingLoggerFile(task.subject, msg);
+                            CompletableFuture<PublishAck> ack = jsConn.publishAsync(task.subject, msg.getBytes());
+                            while (!ack.isDone()) {
+                                if (ack.isCompletedExceptionally()) {
+                                    writeToPublishingLoggerFile(task.subject, msg);
+                                    break;
+                                }
                             }
+                            PublishAck pa = ack.get();
                         } catch (Exception e) {
                             writeToPublishingLoggerFile(task.subject, msg);
                             interrupted = Boolean.TRUE;
