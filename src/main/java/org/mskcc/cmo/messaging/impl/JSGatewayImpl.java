@@ -175,8 +175,7 @@ public class JSGatewayImpl implements Gateway {
             LOG.error("Error deserializing NATS message: " + payload, ex);
         }
         if (message != null) {
-            msg.ack();
-            messageConsumer.onMessage(message);
+            messageConsumer.onMessage(msg, message);
         }
     }
 
