@@ -20,6 +20,7 @@ import io.nats.client.api.ReplayPolicy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -137,6 +138,7 @@ public class JSGatewayImpl implements Gateway {
                     .filterSubject(filterSubject)
                     .deliverPolicy(DeliverPolicy.New)
                     .ackPolicy(AckPolicy.All)
+                    .ackWait(Duration.ofSeconds(30))
                     .replayPolicy(ReplayPolicy.Instant)
                     .build();
             PushSubscribeOptions options = PushSubscribeOptions.builder()
