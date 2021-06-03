@@ -138,7 +138,7 @@ public class JSGatewayImpl implements Gateway {
                     .filterSubject(filterSubject)
                     .deliverPolicy(DeliverPolicy.New)
                     .ackPolicy(AckPolicy.All)
-                    .ackWait(Duration.ofSeconds(30))
+                    .ackWait(Duration.ofSeconds(300))
                     .replayPolicy(ReplayPolicy.Instant)
                     .build();
             PushSubscribeOptions options = PushSubscribeOptions.builder()
