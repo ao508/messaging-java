@@ -198,7 +198,7 @@ public class JSGatewayImpl implements Gateway {
                 @Override
                 public void onMessage(Message msg, Object message) {
                     try {
-                        messageConsumer.onMessage(msg, message);
+//                        messageConsumer.onMessage(msg, message);
                         publish(msg.getReplyTo(), message);
                     } catch (Exception ex) {
                         LOG.error("\n\n\nERROR WHEN ATTEMPTING TO PUBLISH IN REQUEST-REPLY MESSAGER");
