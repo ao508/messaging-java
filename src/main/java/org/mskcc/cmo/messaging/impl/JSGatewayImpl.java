@@ -325,6 +325,7 @@ public class JSGatewayImpl implements Gateway {
                 onMessage(msg, String.class, new MessageConsumer() {
                     @Override
                     public void onMessage(Message msg, Object message) {
+                        msg.ack();
                         natsConnection.publish(msg.getReplyTo(), msg.getData());
                     }
                 }
