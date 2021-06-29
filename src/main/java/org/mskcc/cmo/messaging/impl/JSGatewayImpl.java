@@ -296,7 +296,7 @@ public class JSGatewayImpl implements Gateway {
     }
 
     @Override
-    public Message request(String subject, Object message) {
+    public Message request(String subject, Object message) throws Exception {
         if (!isConnected()) {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
@@ -316,7 +316,7 @@ public class JSGatewayImpl implements Gateway {
     }
 
     @Override
-    public void reply(String subject, Object message, MessageConsumer messageConsumer) {
+    public void reply(String subject, Class messageClass, MessageConsumer messageConsumer) throws Exception {
         if (!isConnected()) {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
@@ -325,8 +325,7 @@ public class JSGatewayImpl implements Gateway {
                 onMessage(msg, String.class, new MessageConsumer() {
                     @Override
                     public void onMessage(Message msg, Object message) {
-                        String replyMsg = mapper.convertValue(message, String.class);
-                        natsConnection.publish(msg.getReplyTo(), replyMsg.getBytes());
+                        natsConnection.publish(msg.getReplyTo(), msg.getData());
                     }
                 }
             ));

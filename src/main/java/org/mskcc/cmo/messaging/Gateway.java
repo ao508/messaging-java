@@ -17,9 +17,9 @@ public interface Gateway {
     void subscribe(String subject, Class messageClass,
             MessageConsumer messageConsumer) throws Exception;
     
-    Message request(String subject, Object message);
+    Message request(String subject, Object message) throws Exception;
     
-    void reply(String subject, Object message, MessageConsumer messageConsumer);
+    void reply(String subject, Class messageClass, MessageConsumer messageConsumer) throws Exception;
 
     void shutdown() throws Exception;
 }
