@@ -194,17 +194,10 @@ public class JSGatewayImpl implements Gateway {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
         try {
-            subscribe(subject, messageClass, new MessageConsumer() {
-                @Override
-                public void onMessage(Message msg, Object message) {
-                    try {
-//                        messageConsumer.onMessage(msg, message);
-                        publish(msg.getReplyTo(), message);
-                    } catch (Exception ex) {
-                        LOG.error("\n\n\nERROR WHEN ATTEMPTING TO PUBLISH IN REQUEST-REPLY MESSAGER");
-                    }
-                }
+            Dispatcher d = natsConnection.createDispatcher((msg) -> {
+                natsConnection.publish(msg.getReplyTo(), msg.getData());
             });
+            d.subscribe(subject);
         } catch (Exception ex) {
             LOG.error("Error during attempt to send a request using NATS connection", ex);
         }
