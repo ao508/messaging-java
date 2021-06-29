@@ -32,6 +32,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mskcc.cmo.common.FileUtil;
@@ -192,16 +194,17 @@ public class JSGatewayImpl implements Gateway {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
         try {
-            
-            Dispatcher dispatcher = natsConnection.createDispatcher();
-            dispatcher.subscribe(subject, (msg) -> onMessage(msg, String.class, new MessageConsumer() {
+            subscribe(subject, messageClass, new MessageConsumer() {
                 @Override
                 public void onMessage(Message msg, Object message) {
-                    System.out.println("\n\nReplying on subject: " + subject);
-                    natsConnection.publish(msg.getReplyTo(), message.toString().getBytes());
+                    try {
+                        messageConsumer.onMessage(msg, message);
+                        publish(msg.getReplyTo(), message);
+                    } catch (Exception ex) {
+                        LOG.error("\n\n\nERROR WHEN ATTEMPTING TO PUBLISH IN REQUEST-REPLY MESSAGER");
+                    }
                 }
-            }));
-            natsConnection.flush(Duration.ofSeconds(requestWaitTime));
+            });
         } catch (Exception ex) {
             LOG.error("Error during attempt to send a request using NATS connection", ex);
         }
