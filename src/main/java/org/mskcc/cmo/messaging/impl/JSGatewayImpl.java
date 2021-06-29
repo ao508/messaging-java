@@ -65,7 +65,7 @@ public class JSGatewayImpl implements Gateway {
 
     @Value("${nats.filter_subject:METADB.*}")
     public String filterSubject;
-    
+
     @Value("${nats.request_wait_time_in_seconds:10}")
     public int requestWaitTime;
 
@@ -161,6 +161,45 @@ public class JSGatewayImpl implements Gateway {
             JetStreamSubscription sub = jsConnection.subscribe(subject, dispatcher,
                 msg -> onMessage(msg, messageClass, messageConsumer), false, options);
             subscribers.put(subject, sub);
+        }
+    }
+
+    @Override
+    public Message request(String subject, Object message) throws Exception {
+        if (!isConnected()) {
+            throw new IllegalStateException("Gateway connection has not been established.");
+        }
+        try {
+            String msg = mapper.writeValueAsString(message);
+            Message reply = natsConnection.request(subject, msg.getBytes(),
+                    Duration.ofSeconds(requestWaitTime));
+            if (reply == null) {
+                LOG.error("No reply received for a request using NATS connection");
+            } else {
+                return reply;
+            }
+        } catch (Exception ex) {
+            LOG.error("Error during attempt to send a request using NATS connection", ex);
+        }
+        return null;
+    }
+
+    @Override
+    public void reply(String subject, Class messageClass, MessageConsumer messageConsumer) throws Exception {
+        if (!isConnected()) {
+            throw new IllegalStateException("Gateway connection has not been established.");
+        }
+        try {
+            Dispatcher dispatcher = natsConnection.createDispatcher();
+            dispatcher.subscribe(subject, (msg) -> onMessage(msg, String.class, new MessageConsumer() {
+                @Override
+                public void onMessage(Message msg, Object message) {
+                    natsConnection.publish(msg.getReplyTo(), msg.getData());
+                }
+            }));
+            natsConnection.flush(Duration.ofSeconds(requestWaitTime));
+        } catch (Exception ex) {
+            LOG.error("Error during attempt to send a request using NATS connection", ex);
         }
     }
 
@@ -292,50 +331,6 @@ public class JSGatewayImpl implements Gateway {
             this.msgId = msgId;
             this.subject = subject;
             this.payload = payload;
-        }
-    }
-
-    @Override
-    public Message request(String subject, Object message) throws Exception {
-        if (!isConnected()) {
-            throw new IllegalStateException("Gateway connection has not been established.");
-        }
-        try {
-            String msg = mapper.writeValueAsString(message);
-            Message reply = natsConnection.request(subject, msg.getBytes(),
-                    Duration.ofSeconds(requestWaitTime));
-            if (reply == null) {
-                LOG.error("No reply received for a request using NATS connection");
-            } else {
-                return reply;
-            }
-        } catch (Exception ex) {
-            LOG.error("Error during attempt to send a request using NATS connection", ex);
-        }
-        return null;
-    }
-
-    @Override
-    public void reply(String subject, Class messageClass, MessageConsumer messageConsumer) throws Exception {
-        if (!isConnected()) {
-            throw new IllegalStateException("Gateway connection has not been established.");
-        }
-        try {
-            Dispatcher dispatcher = natsConnection.createDispatcher((msg) ->
-                onMessage(msg, String.class, new MessageConsumer() {
-                    @Override
-                    public void onMessage(Message msg, Object message) {
-                        msg.ack();
-                        natsConnection.publish(msg.getReplyTo(), msg.getData());
-                    }
-                }
-            ));
-           
-            dispatcher.subscribe(subject);
-            natsConnection.flush(Duration.ofSeconds(requestWaitTime));
-            
-        } catch (Exception ex) {
-            LOG.error("Error during attempt to send a request using NATS connection", ex);
         }
     }
 }
