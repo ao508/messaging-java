@@ -194,7 +194,7 @@ public class JSGatewayImpl implements Gateway {
             dispatcher.subscribe(subject, (msg) -> onMessage(msg, String.class, new MessageConsumer() {
                 @Override
                 public void onMessage(Message msg, Object message) {
-                    natsConnection.publish(msg.getReplyTo(), msg.getData());
+                    natsConnection.publish(msg.getReplyTo(), message.toString().getBytes());
                 }
             }));
             natsConnection.flush(Duration.ofSeconds(requestWaitTime));
