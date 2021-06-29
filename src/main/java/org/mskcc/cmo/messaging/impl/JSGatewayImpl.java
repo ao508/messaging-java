@@ -171,6 +171,8 @@ public class JSGatewayImpl implements Gateway {
         }
         try {
             String msg = mapper.writeValueAsString(message);
+            System.out.println("Received request on subject: " + subject + "  with contents: \n" + msg + "\n\n\n");
+            
             Message reply = natsConnection.request(subject, msg.getBytes(),
                     Duration.ofSeconds(requestWaitTime));
             if (reply == null) {
@@ -190,10 +192,12 @@ public class JSGatewayImpl implements Gateway {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
         try {
+            
             Dispatcher dispatcher = natsConnection.createDispatcher();
             dispatcher.subscribe(subject, (msg) -> onMessage(msg, String.class, new MessageConsumer() {
                 @Override
                 public void onMessage(Message msg, Object message) {
+                    System.out.println("\n\nReplying on subject: " + subject);
                     natsConnection.publish(msg.getReplyTo(), message.toString().getBytes());
                 }
             }));
