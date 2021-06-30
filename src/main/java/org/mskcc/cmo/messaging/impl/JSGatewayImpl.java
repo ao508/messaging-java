@@ -196,11 +196,11 @@ public class JSGatewayImpl implements Gateway {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
         try {
-            Dispatcher d = natsConnection.createDispatcher((msg) -> {
-                natsConnection.publish(replyTo, msg.getData());
-            });
-            d.subscribe(subject);
-            
+//            Dispatcher d = natsConnection.createDispatcher((msg) -> {
+//                natsConnection.publish(replyTo, msg.getData());
+//            });
+//            d.subscribe(subject);
+//            
             
             String msg = mapper.writeValueAsString(message);
             System.out.println("Received request on subject: " + subject + "  with contents: \n" + msg + "\n\n\n");
