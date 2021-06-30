@@ -180,11 +180,13 @@ public class JSGatewayImpl implements Gateway {
             Future<Message> reply = natsConnection.request(subject, msg.getBytes());
             
             Message response = reply.get(requestWaitTime, TimeUnit.MINUTES);
+            Subscription sub = natsConnection.subscribe(response.getReplyTo());
+            
             System.out.println("\n\n\nJET STREAM IMPL REQUEST RESPONSE: " + new String(response.getData()) + "\n\n\n");
             if (reply == null) {
                 LOG.error("No reply received for a request using NATS connection");
             }
-            return response;
+            return sub.nextMessage(Duration.ofMinutes(requestWaitTime));
         } catch (Exception ex) {
             LOG.error("Error during attempt to send a request using NATS connection", ex);
         }
