@@ -176,7 +176,6 @@ public class JSGatewayImpl implements Gateway {
         try {
             String msg = mapper.writeValueAsString(message);
             System.out.println("Received request on subject: " + subject + "  with contents: \n" + msg + "\n\n\n");
-            
             Future<Message> reply = natsConnection.request(subject, msg.getBytes());
             
             Message response = reply.get(requestWaitTime, TimeUnit.MINUTES);
@@ -186,7 +185,7 @@ public class JSGatewayImpl implements Gateway {
             if (reply == null) {
                 LOG.error("No reply received for a request using NATS connection");
             }
-            return sub.nextMessage(Duration.ofMinutes(requestWaitTime));
+            return response;
         } catch (Exception ex) {
             LOG.error("Error during attempt to send a request using NATS connection", ex);
         }
