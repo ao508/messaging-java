@@ -18,8 +18,10 @@ public interface Gateway {
             MessageConsumer messageConsumer) throws Exception;
     
     Message request(String subject, Object message) throws Exception;
+    Message request(String subject, String replyTo, Object message) throws Exception;
     
     void reply(String subject, Object message) throws Exception;
+    void reply(String subject, String replyTo, Object message) throws Exception;
 
     void shutdown() throws Exception;
 }

@@ -189,7 +189,55 @@ public class JSGatewayImpl implements Gateway {
         }
         return null;
     }
+    
+    @Override
+    public Message request(String subject, String replyTo, Object message) throws Exception {
+        if (!isConnected()) {
+            throw new IllegalStateException("Gateway connection has not been established.");
+        }
+        try {
+            Dispatcher d = natsConnection.createDispatcher((msg) -> {
+                natsConnection.publish(replyTo, msg.getData());
+            });
+            d.subscribe(subject);
+            
+            
+            String msg = mapper.writeValueAsString(message);
+            System.out.println("Received request on subject: " + subject + "  with contents: \n" + msg + "\n\n\n");
+            natsConnection.request(subject, msg.getBytes());
+            Subscription sub = natsConnection.subscribe(replyTo);
+            Message response = sub.nextMessage(Duration.ofMinutes(requestWaitTime));
+            sub.unsubscribe();
+            return response;
+//            Message response = reply.get(requestWaitTime, TimeUnit.MINUTES);
+//            System.out.println("JET STREAM IMPL REPLY TO SUBJECT: " + response.getReplyTo());
+//            System.out.println("\n\n\nJET STREAM IMPL REQUEST RESPONSE: " + new String(response.getData()) + "\n\n\n");
+//            if (reply == null) {
+//                LOG.error("No reply received for a request using NATS connection");
+//            }
+//            return response;
+        } catch (Exception ex) {
+            LOG.error("Error during attempt to send a request using NATS connection", ex);
+        }
+        return null;
+    }
 
+    @Override
+    public void reply(String subject, String replyTo, Object message) throws Exception {
+        if (!isConnected()) {
+            throw new IllegalStateException("Gateway connection has not been established.");
+        }
+        try {
+            Dispatcher d = natsConnection.createDispatcher((msg) -> {
+                String replyMsg = mapper.convertValue(message, String.class);
+                natsConnection.publish(replyTo, replyMsg.getBytes());
+            });
+            d.subscribe(subject);
+        } catch (Exception ex) {
+            LOG.error("Error during attempt to send a request using NATS connection", ex);
+        }
+    }
+    
     @Override
     public void reply(String subject, Object message) throws Exception {
         if (!isConnected()) {
