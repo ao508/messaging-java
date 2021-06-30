@@ -177,6 +177,7 @@ public class JSGatewayImpl implements Gateway {
             System.out.println("Received request on subject: " + subject + "  with contents: \n" + msg + "\n\n\n");
             
             Future<Message> reply = natsConnection.request(subject, msg.getBytes());
+            System.out.println("\n\n\nJET STREAM IMPL REQUEST RESPONSE: " + new String(msg.getBytes()) + "\n\n\n");
             if (reply == null) {
                 LOG.error("No reply received for a request using NATS connection");
             } else {
