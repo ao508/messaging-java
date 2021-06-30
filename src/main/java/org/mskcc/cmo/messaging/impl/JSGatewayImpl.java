@@ -201,7 +201,9 @@ public class JSGatewayImpl implements Gateway {
 //            });
 //            d.subscribe(subject);
 //            
-            publish(subject, message);
+            
+            String msg = mapper.convertValue(message, String.class);
+            natsConnection.publish(subject, msg.getBytes());
             Subscription sub = natsConnection.subscribe(replyTo);
             Message response = sub.nextMessage(Duration.ofMinutes(requestWaitTime));
             sub.unsubscribe();
