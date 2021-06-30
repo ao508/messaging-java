@@ -177,10 +177,8 @@ public class JSGatewayImpl implements Gateway {
             String msg = mapper.writeValueAsString(message);
             System.out.println("Received request on subject: " + subject + "  with contents: \n" + msg + "\n\n\n");
             Future<Message> reply = natsConnection.request(subject, msg.getBytes());
-            
-            Message response = reply.get(requestWaitTime, TimeUnit.MINUTES);
-            Subscription sub = natsConnection.subscribe(response.getReplyTo());
-            
+            Message response = reply.get(requestWaitTime, TimeUnit.MINUTES);            
+            System.out.println("JET STREAM IMPL REPLY TO SUBJECT: " + response.getReplyTo());
             System.out.println("\n\n\nJET STREAM IMPL REQUEST RESPONSE: " + new String(response.getData()) + "\n\n\n");
             if (reply == null) {
                 LOG.error("No reply received for a request using NATS connection");
