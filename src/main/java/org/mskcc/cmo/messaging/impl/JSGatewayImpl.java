@@ -30,6 +30,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -175,12 +176,11 @@ public class JSGatewayImpl implements Gateway {
             String msg = mapper.writeValueAsString(message);
             System.out.println("Received request on subject: " + subject + "  with contents: \n" + msg + "\n\n\n");
             
-            Message reply = natsConnection.request(subject, msg.getBytes(),
-                    Duration.ofSeconds(requestWaitTime));
+            Future<Message> reply = natsConnection.request(subject, msg.getBytes());
             if (reply == null) {
                 LOG.error("No reply received for a request using NATS connection");
             } else {
-                return reply;
+                return reply.get(requestWaitTime, TimeUnit.MINUTES);
             }
         } catch (Exception ex) {
             LOG.error("Error during attempt to send a request using NATS connection", ex);
