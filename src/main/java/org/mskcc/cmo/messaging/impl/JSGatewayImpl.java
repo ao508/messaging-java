@@ -197,7 +197,7 @@ public class JSGatewayImpl implements Gateway {
         }
         try {
             Dispatcher d = natsConnection.createDispatcher((msg) -> {
-                natsConnection.publish(msg.getReplyTo(), msg.getData());
+                natsConnection.publish(subject, msg.getReplyTo(), msg.getData());
             });
             d.subscribe(subject);
         } catch (Exception ex) {
