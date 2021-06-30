@@ -14,6 +14,7 @@ import io.nats.client.Options;
 import io.nats.client.Options.Builder;
 import io.nats.client.PublishOptions;
 import io.nats.client.PushSubscribeOptions;
+import io.nats.client.Subscription;
 import io.nats.client.api.AckPolicy;
 import io.nats.client.api.ConsumerConfiguration;
 import io.nats.client.api.DeliverPolicy;
@@ -196,14 +197,11 @@ public class JSGatewayImpl implements Gateway {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
         try {
-            natsConnection.subscribe(subject,  msg -> {
-            natsConnection.publish(msg.getReplyTo(), message.toString().getBytes());
-        });
-//            Dispatcher d = natsConnection.createDispatcher((msg) -> {
-//                String replyMsg = mapper.convertValue(message, String.class);
-//                natsConnection.publish(msg.getReplyTo(), replyMsg.getBytes());
-//            });
-//            d.subscribe(subject);
+            Dispatcher d = natsConnection.createDispatcher((msg) -> {
+                String replyMsg = mapper.convertValue(message, String.class);
+                natsConnection.publish(subject, msg.getReplyTo(), replyMsg.getBytes());
+            });
+            d.subscribe(subject);
         } catch (Exception ex) {
             LOG.error("Error during attempt to send a request using NATS connection", ex);
         }
