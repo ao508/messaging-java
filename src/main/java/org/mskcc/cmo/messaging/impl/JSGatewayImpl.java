@@ -191,7 +191,7 @@ public class JSGatewayImpl implements Gateway {
     }
 
     @Override
-    public void reply(String subject, Object message, MessageConsumer messageConsumer) throws Exception {
+    public void reply(String subject, Object message) throws Exception {
         if (!isConnected()) {
             throw new IllegalStateException("Gateway connection has not been established.");
         }

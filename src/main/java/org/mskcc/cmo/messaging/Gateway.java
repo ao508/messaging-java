@@ -19,7 +19,7 @@ public interface Gateway {
     
     Message request(String subject, Object message) throws Exception;
     
-    void reply(String subject, Object message, MessageConsumer messageConsumer) throws Exception;
+    void reply(String subject, Object message) throws Exception;
 
     void shutdown() throws Exception;
 }
