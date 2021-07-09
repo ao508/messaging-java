@@ -46,7 +46,7 @@
     <dependency>
       <groupId>com.github.ao508</groupId>
       <artifactId>nats.java</artifactId>
-      <version>628b86b02b2b203a9d7f76419add5076b8643e12</version>
+      <version>29582ff4c0199a32a2c04fcc0c88755d0e2dcf52</version>
     </dependency>
 <!--    <dependency>
       <groupId>io.nats</groupId>
