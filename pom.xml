@@ -44,10 +44,15 @@
       <artifactId>spring-boot-starter</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.ao508</groupId>
+      <artifactId>nats.java</artifactId>
+      <version>628b86b02b2b203a9d7f76419add5076b8643e12</version>
+    </dependency>
+<!--    <dependency>
       <groupId>io.nats</groupId>
       <artifactId>jnats</artifactId>
       <version>2.10.0</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>io.nats</groupId>
       <artifactId>nats-spring</artifactId>
