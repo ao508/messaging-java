@@ -14,7 +14,7 @@ public interface Gateway {
     
     void publish(String msgId, String subject, Object message) throws Exception;
 
-    void subscribe(String subject, Class messageClass,
+    void subscribe(String subject, String subscriberFilterSubject, Class messageClass,
             MessageConsumer messageConsumer) throws Exception;
     
     Message request(String subject, String message) throws Exception;

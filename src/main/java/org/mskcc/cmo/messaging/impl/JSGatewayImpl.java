@@ -65,8 +65,8 @@ public class JSGatewayImpl implements Gateway {
     @Value("${nats.consumer_password}")
     public String consumerPassword;
 
-    @Value("${nats.filter_subject:METADB.*}")
-    public String filterSubject;
+//    @Value("${nats.filter_subject:METADB.*}")
+//    public String filterSubject;
     
     @Value("${nats.request_wait_time_in_seconds:10}")
     public int requestWaitTime;
@@ -144,7 +144,7 @@ public class JSGatewayImpl implements Gateway {
     }
 
     @Override
-    public void subscribe(String subject, Class messageClass,
+    public void subscribe(String subject, String subscriberFilterSubject, Class messageClass,
             MessageConsumer messageConsumer) throws Exception {
         if (!isConnected()) {
             throw new IllegalStateException("Gateway connection has not been established.");
@@ -153,7 +153,7 @@ public class JSGatewayImpl implements Gateway {
             Dispatcher dispatcher = natsConnection.createDispatcher();
             ConsumerConfiguration consumerConfig = ConsumerConfiguration.builder()
                     .durable(consumerName)
-                    .filterSubject(filterSubject)
+                    .filterSubject(subscriberFilterSubject)
                     .ackPolicy(AckPolicy.All)
                     .deliverPolicy(DeliverPolicy.New)
                     .build();
