@@ -24,6 +24,7 @@ import io.nats.client.impl.NatsMessage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -325,12 +326,12 @@ public class JSGatewayImpl implements Gateway {
             throw new IllegalStateException("Gateway connection has not been established.");
         }
         if (!shutdownInitiated) {
-            Future<Message> replyFuture = natsConnection.request(NatsMessage.builder()
+            Message reply = natsConnection.request(NatsMessage.builder()
                     .subject(subject)
                     .data(message, StandardCharsets.UTF_8)
-                    .build());
+                    .build(), Duration.ofSeconds(requestWaitTime));
 
-            Message reply = replyFuture.get(requestWaitTime, TimeUnit.SECONDS);
+//            Message reply = replyFuture.get(requestWaitTime, TimeUnit.SECONDS);
             return reply;
         } else {
             LOG.error("Shutdown initiated, not accepting publish request: \n" + message);
